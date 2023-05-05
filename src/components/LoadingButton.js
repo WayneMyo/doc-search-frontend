@@ -10,7 +10,7 @@ const ButtonWrapper = styled.div`
 `;
 
 const StyledButton = styled(Button)`
-  
+    margin: 20px;
 `;
 
 const LoadingButton = ({ buttonText, onClick, color, size }) => {
