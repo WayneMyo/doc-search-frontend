@@ -6,7 +6,7 @@ import { useSnackbar } from "notistack";
 import FileSelector from "../components/FileSelector";
 import LoadingButton from "../components/LoadingButton";
 import DocumentTable from "../components/DocumentTable";
-import { getDocuments, uploadDocument, deleteAllDocuments } from "../api";
+import { getDocuments, uploadDocument, deleteAllDocuments, downloadDocument } from "../api";
 
 const StyledDocumentUploadPage = styled.div``;
 
@@ -36,9 +36,27 @@ const DocumentUploadPage = () => {
         enqueueSnackbar(`Uploading ${selectedFile.name}...`, { variant: "info" });
         const response = await uploadDocument(selectedFile);
 
-        if (response.status) {
+        if (response) {
             enqueueSnackbar(`${selectedFile.name} uploaded successfully`, { variant: "success" });
             setDocuments([...documents, response]);
+        }
+    };
+
+    const handleDownload = async (filename) => {
+        const response = await downloadDocument(filename);
+
+        if (response) {
+            enqueueSnackbar(`Downloading ${filename}`, { variant: "success" });
+
+            const url = window.URL.createObjectURL(new Blob([response]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            enqueueSnackbar(`Error downloading ${filename}`, { variant: "error" });
         }
     };
 
@@ -46,22 +64,37 @@ const DocumentUploadPage = () => {
         enqueueSnackbar(`Deleting all documents...`, { variant: "info" });
         const response = await deleteAllDocuments();
 
-        if (response.status) {
+        if (response) {
             enqueueSnackbar(`All documents deleted successfully`, { variant: "success" });
             setDocuments([]);
+        } else {
+            enqueueSnackbar(`Error deleting all documents`, { variant: "error" });
         }
     };
 
     const columns = [
         { id: "id", label: "ID" },
         { id: "filename", label: "Filename" },
-        { id: "s3_url", label: "Actions" },
+        { id: "actions", label: "Actions" },
     ];
+
+    const documentsWithDownloadButton = documents.map((doc) => ({
+        ...doc,
+        actions: (
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleDownload(doc.filename)}
+            >
+                Download
+            </Button>
+        ),
+    }));
 
     return (
         <StyledDocumentUploadPage>
             <DocumentTable
-                documents={documents}
+                documents={documentsWithDownloadButton}
                 emptyMessage="No documents uploaded."
                 columns={columns}
                 toolbar={

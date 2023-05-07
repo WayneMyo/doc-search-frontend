@@ -40,6 +40,17 @@ export const searchDocuments = async (question) => {
   }
 };
 
+export const downloadDocument = async (fileName) => {
+  try {
+    const response = await api.get(`/documents/download/${fileName}`, { responseType: 'blob' });
+    return response.data;
+  }
+  catch (error) {
+    console.error('Error downloading document:', error);
+    return null;
+  }
+}
+
 export const deleteAllDocuments = async () => {
   try {
     const response = await api.delete('/documents/purge/docs');

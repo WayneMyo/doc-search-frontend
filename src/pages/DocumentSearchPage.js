@@ -6,7 +6,7 @@ import { useSnackbar } from "notistack";
 import SearchBox from "../components/SearchBox";
 import LoadingButton from "../components/LoadingButton";
 import DocumentTable from "../components/DocumentTable";
-import { searchDocuments } from "../api";
+import { searchDocuments, downloadDocument } from "../api";
 
 const StyledDocumentSearchPage = styled.div``;
 
@@ -40,16 +40,47 @@ const DocumentSearchPage = () => {
         }
     };
 
+    const handleDownload = async (filename) => {
+        const response = await downloadDocument(filename);
+
+        if (response) {
+            enqueueSnackbar(`Downloading ${filename}`, { variant: "success" });
+
+            const url = window.URL.createObjectURL(new Blob([response]));
+            const link = document.createElement('a');
+            link.href = url;
+            link.setAttribute('download', filename);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        } else {
+            enqueueSnackbar(`Error downloading ${filename}`, { variant: "error" });
+        }
+    };
+
     const columns = [
         { id: "id", label: "ID" },
         { id: "filename", label: "Filename" },
-        { id: "s3_url", label: "Actions" },
+        { id: "actions", label: "Actions" },
     ];
+
+    const documentsWithDownloadButton = documents.map((doc) => ({
+        ...doc,
+        actions: (
+            <Button
+                variant="contained"
+                color="primary"
+                onClick={() => handleDownload(doc.filename)}
+            >
+                Download
+            </Button>
+        ),
+    }));
 
     return (
         <StyledDocumentSearchPage>
             <DocumentTable
-                documents={documents}
+                documents={documentsWithDownloadButton}
                 summary={searchResSummary}
                 emptyMessage="No documents found."
                 columns={columns}
