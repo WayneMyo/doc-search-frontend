@@ -1,24 +1,52 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import styled from "@emotion/styled";
 import { Link } from "react-router-dom";
 import { Toolbar, Box, Button } from "@mui/material";
+import { useSnackbar } from "notistack";
+import FileSelector from "../components/FileSelector";
 import LoadingButton from "../components/LoadingButton";
 import DocumentTable from "../components/DocumentTable";
+import { getDocuments, uploadDocument } from "../api";
 
 const StyledDocumentUploadPage = styled.div``;
 
 const DocumentUploadPage = () => {
-    const documents = [
-        {
-            id: 1,
-            title: "Document 1",
-            description: "This is document 1",
-        },
-        {
-            id: 2,
-            title: "Document 2",
-            description: "This is document 2",
-        },
+    const { enqueueSnackbar } = useSnackbar();
+    const [documents, setDocuments] = useState([]);
+    const [selectedFile, setSelectedFile] = useState(null);
+
+    useEffect(() => {
+        const fetchData = async () => {
+            const fetchedDocuments = await getDocuments();
+            setDocuments(fetchedDocuments);
+        };
+        fetchData();
+    }, []);
+
+    const handleFileChange = (file) => {
+        setSelectedFile(file);
+    };
+
+    const handleUpload = async () => {
+        if (!selectedFile) {
+            enqueueSnackbar("Please select a file to upload", { variant: "error" });
+            return;
+        }
+
+        enqueueSnackbar(`Uploading ${selectedFile.name}...`, { variant: "info" });
+        const response = await uploadDocument(selectedFile);
+
+        if (response.status) {
+            enqueueSnackbar(`${selectedFile.name} uploaded successfully`, { variant: "success" });
+            setDocuments([...documents, response]);
+        }
+    };
+
+    // Define the columns for the DocumentTable component
+    const columns = [
+        { id: "id", label: "ID" },
+        { id: "filename", label: "Filename" },
+        { id: "s3_url", label: "Actions" },
     ];
 
     return (
@@ -26,13 +54,12 @@ const DocumentUploadPage = () => {
             <DocumentTable
                 documents={documents}
                 emptyMessage="No documents uploaded."
+                columns={columns}
                 toolbar={
                     <Toolbar>
                         <Box display="flex" flexGrow={1}></Box>
-                        <LoadingButton
-                            buttonText="Upload"
-                            onClick={() => console.log("Uploading...")}
-                        />
+                        <FileSelector onFileChange={handleFileChange} />
+                        <LoadingButton buttonText="Upload" onClick={handleUpload} />
                         <Link to="/">
                             <Button>Back</Button>
                         </Link>

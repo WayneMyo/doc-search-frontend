@@ -13,17 +13,15 @@ import {
 } from "@mui/material";
 import styled from "@emotion/styled";
 
-const StyledTableContainer = styled(TableContainer)`
-
-`;
+const StyledTableContainer = styled(TableContainer)``;
 
 const EmptyMessageContainer = styled.div`
-    margin: 35px;
+  margin: 35px;
 `;
 
-const DocumentTable = ({ documents, emptyMessage, toolbar }) => {
+const DocumentTable = ({ columns, documents, emptyMessage, toolbar }) => {
     const [order, setOrder] = useState("asc");
-    const [orderBy, setOrderBy] = useState("title");
+    const [orderBy, setOrderBy] = useState(columns[0].id);
     const [page, setPage] = useState(0);
     const [rowsPerPage, setRowsPerPage] = useState(10);
 
@@ -67,38 +65,34 @@ const DocumentTable = ({ documents, emptyMessage, toolbar }) => {
             <Table aria-label="document table">
                 <TableHead>
                     <TableRow>
-                        <TableCell>
-                            <TableSortLabel
-                                active={orderBy === "title"}
-                                direction={order}
-                                onClick={() => handleRequestSort("title")}
-                            >
-                                Title
-                            </TableSortLabel>
-                        </TableCell>
-                        <TableCell>
-                            <TableSortLabel
-                                active={orderBy === "description"}
-                                direction={order}
-                                onClick={() => handleRequestSort("description")}
-                            >
-                                Description
-                            </TableSortLabel>
-                        </TableCell>
+                        {columns.map((column) => (
+                            <TableCell key={column.id}>
+                                <TableSortLabel
+                                    active={orderBy === column.id}
+                                    direction={order}
+                                    onClick={() => handleRequestSort(column.id)}
+                                >
+                                    {column.label}
+                                </TableSortLabel>
+                            </TableCell>
+                        ))}
                     </TableRow>
                 </TableHead>
                 {displayedDocuments.length > 0 ? (
                     <TableBody>
                         {displayedDocuments.map((doc) => (
                             <TableRow key={doc.id}>
-                                <TableCell>{doc.title}</TableCell>
-                                <TableCell>{doc.description}</TableCell>
+                                {columns.map((column) => (
+                                    <TableCell key={column.id}>{doc[column.id]}</TableCell>
+                                ))}
                             </TableRow>
                         ))}
                     </TableBody>
                 ) : (
                     <EmptyMessageContainer>
-                        <Typography variant="body1">{emptyMessage || "No documents"}</Typography>
+                        <Typography variant="body1">
+                            {emptyMessage || "No documents"}
+                        </Typography>
                     </EmptyMessageContainer>
                 )}
             </Table>
