@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const api = axios.create({
-  baseURL: 'http://localhost:8000',
+  baseURL: 'http://45.77.41.246/v1',
 });
 
 export const getDocuments = async () => {

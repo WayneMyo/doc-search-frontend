@@ -19,7 +19,7 @@ const EmptyMessageContainer = styled.div`
   margin: 35px;
 `;
 
-const DocumentTable = ({ columns, documents, emptyMessage, toolbar }) => {
+const DocumentTable = ({ columns, documents, summary, emptyMessage, toolbar }) => {
     const [order, setOrder] = useState("asc");
     const [orderBy, setOrderBy] = useState(columns[0].id);
     const [page, setPage] = useState(0);
@@ -80,6 +80,13 @@ const DocumentTable = ({ columns, documents, emptyMessage, toolbar }) => {
                 </TableHead>
                 {displayedDocuments.length > 0 ? (
                     <TableBody>
+                        {summary && (
+                            <TableRow>
+                                <TableCell colSpan={columns.length}>
+                                    <Typography variant="subtitle1">{summary}</Typography>
+                                </TableCell>
+                            </TableRow>
+                        )}
                         {displayedDocuments.map((doc) => (
                             <TableRow key={doc.id}>
                                 {columns.map((column) => (

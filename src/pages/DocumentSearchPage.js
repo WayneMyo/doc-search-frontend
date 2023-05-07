@@ -40,7 +40,6 @@ const DocumentSearchPage = () => {
         }
     };
 
-    // Define the columns for the DocumentTable component
     const columns = [
         { id: "id", label: "ID" },
         { id: "filename", label: "Filename" },
@@ -51,6 +50,7 @@ const DocumentSearchPage = () => {
         <StyledDocumentSearchPage>
             <DocumentTable
                 documents={documents}
+                summary={searchResSummary}
                 emptyMessage="No documents found."
                 columns={columns}
                 toolbar={

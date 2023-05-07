@@ -42,7 +42,6 @@ const DocumentUploadPage = () => {
         }
     };
 
-    // Define the columns for the DocumentTable component
     const columns = [
         { id: "id", label: "ID" },
         { id: "filename", label: "Filename" },
