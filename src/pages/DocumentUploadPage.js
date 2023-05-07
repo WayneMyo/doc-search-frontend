@@ -6,7 +6,7 @@ import { useSnackbar } from "notistack";
 import FileSelector from "../components/FileSelector";
 import LoadingButton from "../components/LoadingButton";
 import DocumentTable from "../components/DocumentTable";
-import { getDocuments, uploadDocument } from "../api";
+import { getDocuments, uploadDocument, deleteAllDocuments } from "../api";
 
 const StyledDocumentUploadPage = styled.div``;
 
@@ -42,6 +42,16 @@ const DocumentUploadPage = () => {
         }
     };
 
+    const handleDelete = async () => {
+        enqueueSnackbar(`Deleting all documents...`, { variant: "info" });
+        const response = await deleteAllDocuments();
+
+        if (response.status) {
+            enqueueSnackbar(`All documents deleted successfully`, { variant: "success" });
+            setDocuments([]);
+        }
+    };
+
     const columns = [
         { id: "id", label: "ID" },
         { id: "filename", label: "Filename" },
@@ -56,7 +66,7 @@ const DocumentUploadPage = () => {
                 columns={columns}
                 toolbar={
                     <Toolbar>
-                        <Box display="flex" flexGrow={1}></Box>
+                        <Box display="flex" flexGrow={1}><Button variant="contained" color="error" onClick={handleDelete}>Purge Docs</Button></Box>
                         <FileSelector onFileChange={handleFileChange} />
                         <LoadingButton buttonText="Upload" onClick={handleUpload} />
                         <Link to="/">

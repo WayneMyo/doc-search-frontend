@@ -34,9 +34,9 @@ const DocumentSearchPage = () => {
                 setDocuments(searchResults.documents);
             }
 
-            if (searchResults.summary) {
-                setSearchResSummary(searchResults.summary);
-            }
+            // if (searchResults.summary) {
+            //     setSearchResSummary(searchResults.summary);
+            // }
         }
     };
 
